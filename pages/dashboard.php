@@ -39,7 +39,7 @@ $closedTickets = 0;
 
 							echo "<tr class='linkrow danger' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
 							echo "<td>".$ticket->GetID()."</td>";
-							echo "<td>".($client->IsValid() ? $client->GetUsername() : "N/A")."</td>";
+							echo "<td>".$client->GetUsername()."</td>";
 							echo "<td>".DisplayDatetime($ticket->GetCreationDate())."</td>";
 							echo "<td>".DisplayLimited($ticket->GetDescription())."</td>";
 							echo "</tr>";
@@ -82,7 +82,7 @@ $closedTickets = 0;
 
 							echo "<tr class='linkrow success' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
 							echo "<td>".$ticket->GetID()."</td>";
-							echo "<td>".($client->IsValid() ? $client->GetUsername() : "N/A")."</td>";
+							echo "<td>".$client->GetUsername()."</td>";
 							echo "<td>".DisplayDatetime($ticket->GetCreationDate())."</td>";
 							echo "<td>".DisplayDatetime($ticket->GetClosedDate())."</td>";
 							echo "</tr>";
@@ -147,9 +147,9 @@ $closedTickets = 0;
 						{
 							echo "<tr>";
 							echo "<td>".$num."</td>";
-							echo "<td>".($staff->IsValid() ? $staff->GetUsername() : "N/A")."</td>";
-							echo "<td>".($staff->IsValid() ? $staff->GetName() : "N/A")."</td>";
-							echo "<td>".($staff->IsValid() ? $staff->GetPoints() : "N/A")."</td>";
+							echo "<td>".$staff->GetUsername()."</td>";
+							echo "<td>".$staff->GetName()."</td>";
+							echo "<td>".$staff->GetPoints()."</td>";
 							echo "</tr>";
 
 							$num++;
@@ -231,7 +231,7 @@ foreach($openTickets as $ticket)
 
 while (list($key, $value) = each($openTicketsByBuilding))
 {
-	$parent = Building::GetRealParent($key)->GetParent();
+	$parent = Building::GetCommunity($key);
 
 	if(!array_key_exists($parent, $openTicketsByCommunity))
 	{

@@ -130,7 +130,7 @@ class Ticket extends Base
 
 	public static function GetOpenTicketsInCommunity($building)
 	{
-		$community = Building::GetRealParent($building)->GetParent();
+		$community = Building::GetCommunity($building);
 
 		$tickets = array();
 
@@ -140,7 +140,7 @@ class Ticket extends Base
 		{
 			$client = Client::Load($ticket->GetClientID());
 
-			if($client->IsValid() && Building::GetRealParent($client->GetBuilding())->GetParent() === $community)
+			if($client->IsValid() && Building::GetCommunity($client->GetBuilding()) === $community)
 			{
 				array_push($tickets, $ticket);
 			}
@@ -176,42 +176,42 @@ class Ticket extends Base
 
 	public function GetClientID()
 	{
-		return $this->data["cid"];
+		return $this->GetSafe("cid");
 	}
 
 	public function GetStaffID()
 	{
-		return $this->data["sid"];
+		return $this->GetSafe("sid");
 	}
 
 	public function GetCreatorID()
 	{
-		return $this->data["creatorid"];
+		return $this->GetSafe("creatorid");
 	}
 
 	public function GetCreationDate()
 	{
-		return $this->data["creation_date"];
+		return $this->GetSafe("creation_date");
 	}
 
 	public function GetLastModifiedDate()
 	{
-		return $this->data["last_modified_date"];
+		return $this->GetSafe("last_modified_date");
 	}
 
 	public function GetClosedDate()
 	{
-		return $this->data["closed_date"];
+		return $this->GetSafe("closed_date");
 	}
 
 	public function GetDescription()
 	{
-		return $this->data["description"];
+		return $this->GetSafe("description");
 	}
 
 	public function GetStatus()
 	{
-		return $this->data["status"];
+		return $this->GetSafe("status");
 	}
 
 	public function GetTags()

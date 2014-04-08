@@ -136,10 +136,10 @@ else
 			echo "<tr class='linkrow".$color."' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
 			echo "<td>".$ticket->GetID()."</td>";
 			echo "<td>".($ticket->GetStatus() == STATUS_OPENED ? "Opened" : "Closed")."</td>";
-			echo "<td>".($client->IsValid() ? $client->GetUsername() : "N/A")."</td>";
+			echo "<td>".$client->GetUsername()."</td>";
 			echo "<td>".DisplayDatetime($ticket->GetCreationDate())."</td>";
 			echo "<td>".DisplayLimited($ticket->GetDescription())."</td>";
-			echo "<td>".($staff ? $staff->GetUsername() : "N/A")."</td>";
+			echo "<td>".$staff->GetUsername()."</td>";
 			echo "<td>".DisplayDatetime($ticket->GetClosedDate())."</td>";
 			echo "</tr>";
 		}

@@ -94,7 +94,12 @@ class Base
 
 	public function GetID()
 	{
-		return $this->data["id"];
+		return $this->GetSafe("id");
+	}
+
+	public function GetSafe($key)
+	{
+		return is_null($this->data) ? "N/A" : $this->data[$key];
 	}
 }
 

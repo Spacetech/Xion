@@ -32,27 +32,27 @@ class Client extends Base
 
 	public function GetName()
 	{
-		return $this->data["name"];
+		return $this->GetSafe("name");
 	}
 
 	public function GetUsername()
 	{
-		return $this->data["username"];
+		return $this->GetSafe("username");
 	}
 
 	public function GetBuilding()
 	{
-		return $this->data["building"];
+		return $this->GetSafe("building");
 	}
 
 	public function GetLocation()
 	{
-		return $this->data["location"];
+		return $this->GetSafe("location");
 	}
 
 	public function GetPhoneNumber()
 	{
-		return $this->data["phone_number"];
+		return $this->GetSafe("phone_number");
 	}
 
 	public function Edit($name, $building, $location, $phone_number)
@@ -71,27 +71,6 @@ class Client extends Base
 
 		//$this->Reload();
 	}
-
-	/*
-	public function SaveFromDeletion()
-	{
-		$this->markForDeletion = false;
-	}
-
-	public function CheckAndDelete()
-	{
-		if(!$this->markForDeletion)
-		{
-			return;
-		}
-
-		global $database;
-
-		$statement = $database->prepare("DELETE FROM clients WHERE id=?");
-		$statement->bindParam(1, $this->GetID(), PDO::PARAM_INT);
-		$result = $statement->execute();
-	}
-	*/
 }
 
 ?>

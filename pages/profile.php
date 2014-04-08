@@ -20,7 +20,7 @@ else
 
 	<p>Account Type: <?php echo Staff::GetTypeReal($profile->GetType()); ?></p>
 
-	<p>Community: <?php echo Building::GetRealParent($profile->GetBuilding())->GetParent(); ?></p>
+	<p>Community: <?php echo Building::GetCommunity($profile->GetBuilding()); ?></p>
 
 	<p>Building: <?php echo $profile->GetBuilding(); ?></p>
 

@@ -47,7 +47,7 @@ if(Pages::GetCurrentPage() == "SMS")
 		exit;
 	}
 
-	$body = "Client Information\nID: ".$client->GetUsername()."\nName: ".$client->GetName()."\nCommunity: ".Building::GetRealParent($client->GetBuilding())->GetParent()."\nBuilding: ".$client->GetBuilding()."\nRoom: ".$client->GetLocation();
+	$body = "Client Information\nID: ".$client->GetUsername()."\nName: ".$client->GetName()."\nCommunity: ".Building::GetCommunity($client->GetBuilding())."\nBuilding: ".$client->GetBuilding()."\nRoom: ".$client->GetLocation();
 
 	$remaining = 255 - strlen($body);
 
@@ -124,7 +124,7 @@ else if(Pages::GetCurrentPage() == "Typeahead")
 			$data["building"] = $client->GetBuilding();
 			$data["location"] = $client->GetLocation();
 			$data["phone_number"] = $client->GetPhoneNumber();
-			$data["community"] = Building::GetRealParent($client->GetBuilding())->GetParent();
+			$data["community"] = Building::GetCommunity($client->GetBuilding());
 		}
 	}
 	else if(isset($_GET["sq"]))
@@ -231,7 +231,7 @@ else if(Pages::GetCurrentPage() == "Typeahead")
 						</a>
 						<ul class="dropdown-menu dropdown-messages">
 							<li>
-								<a href="index.php?p=profile	"><i class="fa fa-user fa-fw"></i> User Profile</a>
+								<a href="index.php?p=profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
 							</li>
 							<li>
 								<a href="index.php?p=settings"><i class="fa fa-gear fa-fw"></i> Settings</a>

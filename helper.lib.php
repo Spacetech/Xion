@@ -59,21 +59,17 @@ function DisplayLimited($str, $limit = 100)
 	return $str;
 }
 
-function LogAction($action)
+function LogAction($msg)
 {
-	if(!file_exists("log.data"))
-	{
-		file_put_contents("log.data", "{}", LOCK_EX);
-	}
-	
-	$data = json_decode(file_get_contents("log.data"), true);
-	
-	array_push($data, array("Time" => time(), "User" => is_null($me) ? "N/A" : $me->GetUsername(), "Action" => $action, "RequestUri" => $_SERVER["REQUEST_URI"]));
-	
-	file_put_contents("log.data", json_encode($data), LOCK_EX);
+	LogGeneric("Error", $msg);
 }
 
-function LogError($error)
+function LogError($msg)
+{
+	LogGeneric("Error", $msg);
+}
+
+function LogGeneric($type, $msg)
 {
 	global $me;
 	
@@ -84,7 +80,12 @@ function LogError($error)
 	
 	$data = json_decode(file_get_contents("log.data"), true);
 	
-	array_push($data, array("Time" => time(), "User" => is_null($me) ? "N/A" : $me->GetUsername(), "Error" => $error, "RequestUri" => $_SERVER["REQUEST_URI"]));
+	if(!is_array($data))
+	{
+		$data = array();
+	}
+
+	array_push($data, array("Time" => time(), "User" => is_null($me) ? "N/A" : $me->GetUsername(), $type => $msg, "RequestUri" => $_SERVER["REQUEST_URI"]));
 	
 	file_put_contents("log.data", json_encode($data), LOCK_EX);
 }

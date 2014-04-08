@@ -72,42 +72,42 @@ class Staff extends Base
 
 	public function GetName()
 	{
-		return $this->data["name"];
+		return $this->GetSafe("name");
 	}
 
 	public function GetUsername()
 	{
-		return $this->data["username"];
+		return $this->GetSafe("username");
 	}
 
 	public function GetPassword()
 	{
-		return $this->data["password"];
+		return $this->GetSafe("password");
 	}
 
 	public function GetBuilding()
 	{
-		return $this->data["building"];
+		return $this->GetSafe("building");
 	}
 
 	public function GetEmail()
 	{
-		return $this->data["email"];
+		return $this->GetSafe("email");
 	}
 
 	public function GetPhoneNumber()
 	{
-		return $this->data["phone_number"];
+		return $this->GetSafe("phone_number");
 	}
 
 	public function GetType()
 	{
-		return $this->data["type"];
+		return $this->GetSafe("type");
 	}
 
 	public function GetPoints()
 	{
-		return $this->data["points"];
+		return $this->GetSafe("points");
 	}
 
 	public function IncrementPoints($amount)

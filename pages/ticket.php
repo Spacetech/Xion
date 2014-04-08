@@ -14,32 +14,15 @@ if(is_null($ticket) || !$ticket->IsValid())
 else
 {
 
-$creator = Staff::Load($ticket->GetCreatorID());
-if($creator->IsValid())
-{
-	$creator = $creator->GetUsername();
-}
-else
-{
-	$creator = "N/A";
-}
+$creator = Staff::Load($ticket->GetCreatorID())->GetUsername();
 
 $client = Client::Load($ticket->GetClientID());
 
-$clientid = "N/A";
-$name = "N/A";
-$community = "N/A";
-$building = "N/A";
-$room = "N/A";
-
-if($client->IsValid())
-{
-	$clientid = $client->GetUsername();
-	$name = $client->GetName();
-	$community = Building::GetRealParent($client->GetBuilding())->GetParent();
-	$building = $client->GetBuilding();
-	$room = $client->GetLocation();
-}
+$clientid = $client->GetUsername();
+$name = $client->GetName();
+$community = Building::GetCommunity($client->GetBuilding());
+$building = $client->GetBuilding();
+$room = $client->GetLocation();
 
 ?>
 
@@ -108,17 +91,8 @@ $staff = Staff::Load($ticket->GetStaffID());
 
 $opened = $ticket->GetStatus() == STATUS_OPENED;
 
-$assignedTo = "N/A";
-$assignedToMe = false;
-
-if($staff->IsValid())
-{
-	$assignedTo = $staff->GetUsername();
-	if($staff->GetID() == $me->GetID())
-	{
-		$assignedToMe = true;
-	}
-}
+$assignedTo = $staff->GetUsername();
+$assignedToMe = $staff->GetID() === $me->GetID();
 
 ?>
 
@@ -308,7 +282,7 @@ if(!is_null($updates))
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-target="#collapse_<?php echo $i; ?>">Update #<?php echo $i + 1; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?></a>
+						<a data-toggle="collapse" data-target="#collapse_<?php echo $i; ?>">Update #<?php echo $i + 1; ?> - <?php echo $update_staff->GetUsername(); ?> - <?php echo DisplayDatetime($time); ?></a>
 					</h4>
 				</div>
 				<div id="collapse_<?php echo $i; ?>" class="panel-collapse collapse in">
@@ -317,15 +291,6 @@ if(!is_null($updates))
 					</div>
 				</div>
 			</div>
-			<!--
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							Update #<?php echo $i; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?>
-						</div>
-						<div class="panel-body">
-							<?php echo $description; ?>
-						</div>
-					</div>-->
 			<?php
 		}
 		?>
