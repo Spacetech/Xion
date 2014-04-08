@@ -24,7 +24,7 @@ require_once("twilio-php-latest/Services/Twilio.php");
 function ErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 {
 	LogError(debug_backtrace());
-	
+	/*
 	echo 'Into '.__FUNCTION__.'() at line '.__LINE__.
 	"\n\n---ERRNO---\n". print_r( $errno, true).
 	"\n\n---ERRSTR---\n". print_r( $errstr, true).
@@ -33,6 +33,7 @@ function ErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 	"\n\n---ERRCONTEXT---\n".print_r( $errcontext, true).
 	"\n\nBacktrace of errorHandler()\n".
 	print_r( debug_backtrace(), true);
+	*/
 	return true;
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-$q = QUERY_OPEN_TICKETS_IN_MY_COMMUNITY;
+$q = QUERY_ALL_MY_TICKETS;
 
 if(isset($_GET["q"]))
 {

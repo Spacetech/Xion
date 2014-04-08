@@ -6,11 +6,12 @@ class Ticket extends Base
 	{
 		global $database;
 
+		$zero = 0;
 		$current_time = time();
+		$encodedTags = json_encode($tags);
+		$encodedNull = json_encode(null);
 
 		$statement = $database->prepare("INSERT INTO tickets (cid, sid, creatorid, creation_date, last_modified_date, closed_date, description, status, tags, updates) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-		$zero = 0;
 
 		$statement->bindParam(1, $cid, PDO::PARAM_INT);
 		$statement->bindParam(2, $sid, PDO::PARAM_INT);
@@ -20,8 +21,8 @@ class Ticket extends Base
 		$statement->bindParam(6, $zero, PDO::PARAM_INT);
 		$statement->bindParam(7, $description, PDO::PARAM_STR);
 		$statement->bindParam(8, $status, PDO::PARAM_INT);
-		$statement->bindParam(9, json_encode($tags), PDO::PARAM_STR);
-		$statement->bindParam(10, json_encode(null), PDO::PARAM_STR);
+		$statement->bindParam(9, $encodedTags, PDO::PARAM_STR);
+		$statement->bindParam(10, $encodedNull, PDO::PARAM_STR);
 
 		$statement->execute();
 
@@ -242,13 +243,14 @@ class Ticket extends Base
 	{
 		global $database;
 
+		$id = self::GetID();
 		$current_time = time();
 
 		$statement = $database->prepare("UPDATE tickets SET last_modified_date=?, closed_date=?, status=? WHERE id=?");
 		$statement->bindParam(1, $current_time, PDO::PARAM_INT);
 		self::SetStatusParam($statement, 2, $status);
 		$statement->bindParam(3, $status, PDO::PARAM_INT);
-		$statement->bindParam(4, self::GetID(), PDO::PARAM_INT);
+		$statement->bindParam(4, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();
@@ -258,12 +260,13 @@ class Ticket extends Base
 	{
 		global $database;
 
+		$id = self::GetID();
 		$current_time = time();
 
 		$statement = $database->prepare("UPDATE tickets SET last_modified_date=?, sid=? WHERE id=?");
 		$statement->bindParam(1, $current_time, PDO::PARAM_INT);
 		$statement->bindParam(2, $sid, PDO::PARAM_INT);
-		$statement->bindParam(3, self::GetID(), PDO::PARAM_INT);
+		$statement->bindParam(3, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();
@@ -273,7 +276,9 @@ class Ticket extends Base
 	{
 		global $database;
 
+		$id = self::GetID();
 		$current_time = time();
+		$encodedTags = json_encode($tags);
 
 		$statement = $database->prepare("UPDATE tickets SET sid=?, last_modified_date=?, closed_date=?, description=?, status=?, tags=? WHERE id=?");
 		$statement->bindParam(1, $sid, $sid);
@@ -281,23 +286,24 @@ class Ticket extends Base
 		self::SetStatusParam($statement, 3, $status);
 		$statement->bindParam(4, $description, PDO::PARAM_STR);
 		$statement->bindParam(5, $status, PDO::PARAM_INT);
-		$statement->bindParam(6, json_encode($tags), PDO::PARAM_STR);
-		$statement->bindParam(7, self::GetID(), PDO::PARAM_INT);
+		$statement->bindParam(6, $encodedTags, PDO::PARAM_STR);
+		$statement->bindParam(7, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();
 	}
 
-	public function AddUpdate($id, $update)
+	public function AddUpdate($sid, $update)
 	{
 		global $database;
 
+		$id = self::GetID();
 		$current_time = time();
 
 		$updates = $this->GetUpdates();
 
 		$newUpdate = array(
-			"id" => $id,
+			"id" => $sid,
 			"time" => $current_time,
 			"description" => strip_tags($update)
 		);
@@ -309,10 +315,12 @@ class Ticket extends Base
 		
 		array_push($updates, $newUpdate);
 
+		$encodedUpdates = json_encode($updates);
+
 		$statement = $database->prepare("UPDATE tickets SET last_modified_date=?, updates=? WHERE id=?");
 		$statement->bindParam(1, $current_time, PDO::PARAM_INT);
-		$statement->bindParam(2, json_encode($updates), PDO::PARAM_STR);
-		$statement->bindParam(3, self::GetID(), PDO::PARAM_INT);
+		$statement->bindParam(2, $encodedUpdates, PDO::PARAM_STR);
+		$statement->bindParam(3, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();

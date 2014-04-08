@@ -114,11 +114,12 @@ class Staff extends Base
 	{
 		global $database;
 
+		$id = $this->GetID();
 		$newPoints = $this->GetPoints() + $amount;
 
 		$statement = $database->prepare("UPDATE staff SET points=? WHERE id=?");
 		$statement->bindParam(1, $newPoints, PDO::PARAM_INT);
-		$statement->bindParam(2, $this->GetID(), PDO::PARAM_INT);
+		$statement->bindParam(2, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();
@@ -144,6 +145,7 @@ class Staff extends Base
 
 	public function SendEmail($title, $body)
 	{
+		global $system_name;
 		global $emailArray;
 		
 		try
@@ -168,9 +170,11 @@ class Staff extends Base
 	{
 		global $database;
 
+		$id = $this->GetID();
+
 		$statement = $database->prepare("UPDATE staff SET password=? WHERE id=?");
 		$statement->bindParam(1, $password, PDO::PARAM_STR);
-		$statement->bindParam(2, $this->GetID(), PDO::PARAM_INT);
+		$statement->bindParam(2, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		//$this->Reload();
@@ -180,13 +184,15 @@ class Staff extends Base
 	{
 		global $database;
 
+		$id = $this->GetID();
+
 		$statement = $database->prepare("UPDATE staff SET name=?, type=?, building=?, email=?, phone_number=? WHERE id=?");
 		$statement->bindParam(1, $name, PDO::PARAM_STR);
 		$statement->bindParam(2, $type, PDO::PARAM_INT);
 		$statement->bindParam(3, $building, PDO::PARAM_STR);
 		$statement->bindParam(4, $email, PDO::PARAM_STR);
 		$statement->bindParam(5, $phone_number, PDO::PARAM_STR);
-		$statement->bindParam(6, $this->GetID(), PDO::PARAM_INT);
+		$statement->bindParam(6, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();

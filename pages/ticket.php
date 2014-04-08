@@ -287,8 +287,6 @@ if($staff->IsValid())
 
 $updates = $ticket->GetUpdates();
 
-$uid = 1;
-
 if(!is_null($updates))
 {
 ?>
@@ -296,24 +294,24 @@ if(!is_null($updates))
 	<div class="col-lg-12">
 		<div class="panel-group" id="accordion">
 		<?php
-		for($i=count($updates) - 1; $i >= 0; $i--)
+		for($i=0; $i < count($updates); $i++)
 		{
 			$update = $updates[$i];
 
 			$id = $update["id"];
 			$time = $update["time"];
 			$description = $update["description"];
-
+			
 			$update_staff = Staff::Load($id);
 
 			?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
 					<h4 class="panel-title">
-						<a data-toggle="collapse" data-target="#collapse_<?php echo $uid; ?>">Update #<?php echo $uid; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?></a>
+						<a data-toggle="collapse" data-target="#collapse_<?php echo $i; ?>">Update #<?php echo $i + 1; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?></a>
 					</h4>
 				</div>
-				<div id="collapse_<?php echo $uid; ?>" class="panel-collapse collapse in">
+				<div id="collapse_<?php echo $i; ?>" class="panel-collapse collapse in">
 					<div class="panel-body">
 						<?php echo $description; ?>
 					</div>
@@ -322,15 +320,13 @@ if(!is_null($updates))
 			<!--
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							Update #<?php echo $uid; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?>
+							Update #<?php echo $i; ?> - <?php echo $update_staff->IsValid() ? $update_staff->GetUsername() : "N/A"; ?> - <?php echo DisplayDatetime($time); ?>
 						</div>
 						<div class="panel-body">
 							<?php echo $description; ?>
 						</div>
 					</div>-->
 			<?php
-
-			$uid++;
 		}
 		?>
 		</div>
