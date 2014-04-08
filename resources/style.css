@@ -1,0 +1,170 @@
+body
+{
+	background-color: #ffffff;
+}
+
+.bigp
+{
+	padding: 15px;
+}
+
+.page-header
+{
+	padding-bottom: 9px;
+	margin: 20px 0 20px;
+	border-bottom: 1px solid #eee;
+}
+
+@media(min-width:768px){
+	#page-wrapper
+	{
+		margin: 0 0 0 200px;
+	}
+
+	.navbar-static-side
+	{
+		width: 200px;
+	}
+}
+
+.navbar-brand
+{
+	padding: 3px;
+}
+
+.control-label
+{
+	text-align: left;
+}
+
+.col-sm-2
+{
+	padding-right: 0px;
+}
+
+.typeahead:focus
+{
+	border: 2px solid #0097cf;
+}
+
+.tt-query
+{
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint
+{
+	color: #999;
+}
+
+.tt-dropdown-menu
+{
+	width: 200px;
+	margin-top: 2px;
+	padding: 1px 0;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+	box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion
+{
+	padding: 3px 20px;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+.tt-suggestion.tt-cursor
+{
+	color: #fff;
+	background-color: #0097cf;
+}
+
+.tt-suggestion p
+{
+	margin: 0;
+}
+
+.twitter-typeahead
+{
+	width: 100%;
+}
+
+a
+{
+	cursor: pointer;
+}
+
+.bootstrap-select
+{
+	width: 100% !important;
+}
+
+#page-wrapper
+{
+	min-height: 0px;
+	padding-bottom: 20px;
+}
+
+.modal-body
+{
+	padding-bottom: 0px
+}
+
+.modal-footer
+{
+	padding: 10px 20px 8px;
+}
+
+.nopadding
+{
+	padding: 6px 6px;
+}
+
+.less-margin-bottom
+{
+	margin-bottom: 4px;
+}
+
+.nopadding .table
+{
+	margin-bottom: 0px;
+}
+
+.fixlabel
+{
+	float: left;
+	margin-right: 4px;
+	padding-top: 6px;
+}
+
+.navbar-top-links .dropdown-messages, .navbar-top-links .dropdown-tasks, .navbar-top-links .dropdown-alerts
+{
+	width: 150px;
+	min-width: 0;
+}
+
+.bigp
+{
+	margin-top: 5px;
+}
+
+#morris-calls-open-per-community text[text-anchor="middle"]
+{
+	opacity: 0;
+}
+
+table.dataTable thead .sorting
+{
+	background: none;
+}
+
+table.dataTable thead .sorting_desc
+{
+	background: none;
+}

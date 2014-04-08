@@ -1,0 +1,82 @@
+<?php
+
+date_default_timezone_set("America/New_York");
+
+$system_name = "Xion";
+
+$password_salt = "salt_here";
+
+$twilioAccountSid = "twilio_account_sid";
+$twilioAuthToken = "twilio_auth_token";
+
+$emailArray = array(
+	'host' => 'ssl://smtp.gmail.com',
+	'port' => '465',
+	'auth' => true,
+	'username' => 'username@gmail.com',
+	'password' => 'password'
+);
+
+$database = new PDO("sqlite:database.sqlite3");
+
+/*
+
+pear channel-discover twilio.github.com/pear
+pear install twilio/Services_Twilio
+
+pear install Mail
+pear install Net_SMTP
+
+-- Describe USERS
+CREATE TABLE "clients" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"name" TEXT,
+	"username" TEXT,
+	"building" TEXT,
+	"location" TEXT,
+	"phone_number" TEXT
+)
+
+-- Describe STAFF
+CREATE TABLE "staff" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"type" INTEGER,
+	"name" TEXT,
+	"username" TEXT,
+	"password" TEXT,
+	"building" TEXT,
+	"email" TEXT,
+	"phone_number" TEXT,
+	"points" INTEGER
+)
+
+-- Describe TICKETS
+CREATE TABLE "tickets" (
+	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"cid" INTEGER,
+	"sid" INTEGER,
+	"creatorid" INTEGER,
+	"creation_date" INTEGER,
+	"last_modified_date" INTEGER,
+	"closed_date" INTEGER,
+	"description" TEXT,
+	"updates" TEXT,
+	"status" INTEGER,
+	"tags" TEXT
+)
+
+-- Describe TAGS
+CREATE TABLE "tags" (
+	"parent" TEXT,
+	"child" TEXT
+)
+
+-- Describe BUILDINGS
+CREATE TABLE "buildings" (
+	"parent" TEXT,
+	"child" TEXT
+)
+
+*/
+
+?>
