@@ -34,7 +34,8 @@ CREATE TABLE "clients" (
 	"username" TEXT,
 	"building" TEXT,
 	"location" TEXT,
-	"phone_number" TEXT
+	"phone_number" TEXT,
+	"active" INTEGER(1)
 )
 
 -- Describe STAFF
@@ -47,7 +48,8 @@ CREATE TABLE "staff" (
 	"building" TEXT,
 	"email" TEXT,
 	"phone_number" TEXT,
-	"points" INTEGER
+	"points" INTEGER,
+	"active" INTEGER(1)
 )
 
 -- Describe TICKETS

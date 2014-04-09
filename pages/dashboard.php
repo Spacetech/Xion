@@ -1,9 +1,7 @@
 <?php
 
-$tickets = Ticket::GetByStaffID($me->GetID());
-
-$openTickets = 0;
-$closedTickets = 0;
+$openTickets = Ticket::GetByStaffIDWithStatus($me->GetID(), STATUS_OPENED);
+$closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLOSED, "closed_date", "DESC");
 
 ?>
 
@@ -20,22 +18,15 @@ $closedTickets = 0;
 							<th width="25px">#</th>
 							<th width="55px">Client</th>
 							<th width="120px">Opened Date</th>
-							<th width="55px">Closed Date</th>
+							<th width="55px">Description</th>
 						</tr>
 					</thead>
 					<tbody class="searchable rowlink" data-link="row">
 						<?php
 
-						foreach($tickets as $ticket)
+						foreach($openTickets as $ticket)
 						{
 							$client = Client::Load($ticket->GetClientID());
-
-							if($ticket->GetStatus() != STATUS_OPENED)
-							{
-								continue;
-							}
-							
-							$openTickets++;
 
 							echo "<tr class='linkrow danger' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
 							echo "<td>".$ticket->GetID()."</td>";
@@ -69,16 +60,9 @@ $closedTickets = 0;
 					<tbody class="searchable rowlink" data-link="row">
 						<?php
 
-						foreach($tickets as $ticket)
+						foreach($closedTickets as $ticket)
 						{
 							$client = Client::Load($ticket->GetClientID());
-
-							if($ticket->GetStatus() != STATUS_CLOSED)
-							{
-								continue;
-							}
-							
-							$closedTickets++;
 
 							echo "<tr class='linkrow success' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
 							echo "<td>".$ticket->GetID()."</td>";
@@ -104,7 +88,7 @@ $closedTickets = 0;
 			<div class="panel-body nopadding">
 				<div id="morris-lifetime-ticket-stats"></div>
 				<?php
-				if($openTickets == 0 && $closedTickets == 0)
+				if(count($openTickets) == 0 && count($closedTickets) == 0)
 				{
 					echo "No stats available.";
 				}
@@ -168,21 +152,21 @@ $(document).ready(function() {
 		element: 'morris-lifetime-ticket-stats',
 		data: [
 		<?php 
-		if($openTickets > 0)
+		if(count($openTickets) > 0)
 		{
 		?>
 			{
 				label: "Open Tickets",
-				value: <?php echo $openTickets; ?>
+				value: <?php echo count($openTickets); ?>
 			},
 		<?php
 		}
-		if($closedTickets > 0)
+		if(count($closedTickets) > 0)
 		{
 		?>
 		{
 			label: "Closed Tickets",
-			value: <?php echo $closedTickets; ?>
+			value: <?php echo count($closedTickets); ?>
 		}
 		<?php
 		}
@@ -191,12 +175,12 @@ $(document).ready(function() {
 		colors: [
 		<?php
 
-		if($openTickets > 0)
+		if(count($openTickets) > 0)
 		{
 			echo '"#ff0000",';
 		}
 
-		if($closedTickets > 0)
+		if(count($closedTickets) > 0)
 		{
 			echo '"#00ff00",';
 		}

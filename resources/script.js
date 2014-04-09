@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
 	$('table').not(".nodatatable").dataTable({
+		"aaSorting": [],
 		"oLanguage": {
 			"sSearch": "<i class=\"fa fa-search\"></i> <span style=\"font-weight: 700; margin-right: 4px;\">Filter </span>"
 		}

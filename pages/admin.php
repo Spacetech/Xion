@@ -32,17 +32,35 @@ if(isset($_GET["staff"]))
 		{
 			ShowError("Invalid building.");
 		}
-		elseif(Staff::GetByUsername($username)->IsValid())
-		{
-			ShowError("A staff member with that username already exists");
-		}
 		else
 		{
-			Staff::Add($name, $type, $username, EncryptPassword($password), $building, $email, $phone_number);
+			$staff = Staff::GetByUsername($username);
 
-			ShowInfo("Created Staff Member Successfully");
+			if($staff->IsValid())
+			{
+				if($staff->IsActive())
+				{
+					ShowError("A staff member with that username already exists");
+				}
+				else
+				{
+					$staff->SetPassword(EncryptPassword($password));
 
-			RedirectTimer("admin&amp;staff", 3);
+					$staff->Edit($name, $type, $building, $email, $phone_number);
+
+					ShowInfo("Created Staff Member Successfully");
+
+					RedirectTimer("admin&amp;staff", 3);
+				}
+			}
+			else
+			{
+				Staff::Add($name, $type, $username, EncryptPassword($password), $building, $email, $phone_number);
+
+				ShowInfo("Created Staff Member Successfully");
+
+				RedirectTimer("admin&amp;staff", 3);
+			}
 		}
 	}
 	elseif(isset($_GET["add"]))
@@ -115,7 +133,7 @@ if(isset($_GET["staff"]))
 	elseif(isset($_GET["id"]))
 	{
 		$staff = Staff::Load($_GET["id"]);
-		if($staff->IsValid() && $me->GetType() == TYPE_SUPERSTAFF)
+		if($staff->IsValid() && $staff->IsActive() && $me->GetType() == TYPE_SUPERSTAFF)
 		{
 			if(isset($_POST["edit"]))
 			{
@@ -246,7 +264,7 @@ if(isset($_GET["staff"]))
 			}
 			elseif(isset($_GET["delete"]))
 			{
-				Staff::Remove($_GET["id"]);
+				$staff->SetActive(0);
 				ShowInfo("Successfully deleted account");
 				RedirectTimer("admin&amp;accounts", 3);
 			}
@@ -281,6 +299,11 @@ if(isset($_GET["staff"]))
 				<?php
 				foreach(Staff::GetAll() as $staff)
 				{
+					if(!$staff->IsActive())
+					{
+						continue;
+					}
+
 					echo "<tr>";
 					echo "<td>".$staff->GetID()."</td>";
 					echo "<td>".$staff->GetName()."</td>";
@@ -374,6 +397,12 @@ elseif(isset($_GET["clients"]))
 						// get all current clients
 						$clients = Client::GetAll();
 
+						// mark them all as inactive
+						foreach($clients as $client)
+						{
+							$client->SetActive(0);
+						}
+
 						while(($line = fgets($handle)) !== false)
 						{
 							if(strpos($line, "#") === 0)
@@ -392,7 +421,7 @@ elseif(isset($_GET["clients"]))
 								{
 									// update the existing one
 									$done = true;
-									//$client->SaveFromDeletion();
+									$client->SetActive(1);
 									$client->Edit($data[0], $data[2], $data[3], $data[4]);
 									break;
 								}
@@ -407,12 +436,10 @@ elseif(isset($_GET["clients"]))
 
 						fclose($handle);
 
-						/*
 						foreach($clients as $client)
 						{
-							$client->CheckAndDelete();
+							$client->UpdateActive();
 						}
-						*/
 
 						$database->commit();
 
@@ -432,7 +459,7 @@ elseif(isset($_GET["clients"]))
 				<label for="file">Client Database File</label>
 				<input type="file" class="form-control" id="file" name="file">
 				<p class="help-block">Select the client database file.</p>
-				<h2>This will merge all existing clients on the system with the ones from the file.</h2>
+				<h2>This will merge all existing clients with the ones from the file.</h2>
 			</div>
 			<div class="form-group">
 				<button type="submit" name="upload" class="btn btn-default">Upload Client Database File</button>
@@ -462,6 +489,11 @@ elseif(isset($_GET["clients"]))
 				<?php
 				foreach(Client::GetAll() as $client)
 				{
+					if(!$client->IsActive())
+					{
+						continue;
+					}
+
 					echo "<tr>";
 					echo "<td>".$client->GetID()."</td>";
 					echo "<td>".$client->GetName()."</td>";

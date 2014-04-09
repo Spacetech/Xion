@@ -47,7 +47,7 @@ class Ticket extends Base
 		return $all;
 	}
 
-	public static function GetByStaffIDOrder($sid, $column, $dir)
+	public static function GetByStaffIDOrderSingle($sid, $column, $dir)
 	{
 		global $database;
 
@@ -81,6 +81,25 @@ class Ticket extends Base
 		global $database;
 
 		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=?");
+		$statement->bindParam(1, $sid, PDO::PARAM_INT);
+		$statement->bindParam(2, $status, PDO::PARAM_INT);
+		$statement->execute();
+
+		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+		for($i=0; $i < count($all); $i++)
+		{
+			$all[$i] = self::LoadData($all[$i]);
+		}
+
+		return $all;
+	}
+
+	public static function GetByStaffIDWithStatusAndOrder($sid, $status, $column, $dir)
+	{
+		global $database;
+
+		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=? ORDER BY ".$column." ".$dir."");
 		$statement->bindParam(1, $sid, PDO::PARAM_INT);
 		$statement->bindParam(2, $status, PDO::PARAM_INT);
 		$statement->execute();

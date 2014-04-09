@@ -37,7 +37,7 @@ function ErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 	return true;
 }
 
-set_error_handler("ErrorHandler");
+//set_error_handler("ErrorHandler");
 
 Pages::Init();
 
@@ -51,7 +51,7 @@ function UpdateLoggedIn()
 
 	$me = Session::GetStaff();
 
-	if(is_object($me) && !$me->IsValid())
+	if(!is_object($me) || !$me->IsValid() || !$me->IsActive())
 	{
 		$me = null;
 	}

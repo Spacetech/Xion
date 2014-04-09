@@ -35,7 +35,7 @@ if(Pages::GetCurrentPage() == "SMS")
 		exit;
 	}
 
-	$lastTicket = Ticket::GetByStaffIDOrder($staff->GetID(), "last_modified_date", "DESC");
+	$lastTicket = Ticket::GetByStaffIDOrderSingle($staff->GetID(), "last_modified_date", "DESC");
 	if(!$lastTicket->IsValid())
 	{
 		exit;
@@ -85,7 +85,7 @@ if(is_null($me))
 		else
 		{
 			$staff = Staff::GetByUsername($username);
-			if($staff->IsValid())
+			if($staff->IsValid() && $staff->IsActive())
 			{
 				if($staff->GetPassword() == EncryptPassword($password))
 				{
@@ -118,7 +118,7 @@ else if(Pages::GetCurrentPage() == "Typeahead")
 
 		$client = Client::GetByUsername($un);
 
-		if($client->IsValid())
+		if($client->IsValid() && $client->IsActive())
 		{
 			$data["name"] = $client->GetName();
 			$data["building"] = $client->GetBuilding();
@@ -135,7 +135,7 @@ else if(Pages::GetCurrentPage() == "Typeahead")
 
 		foreach($staffs as $staff)
 		{
-			if(strpos($staff->GetUsername(), $query) === 0)
+			if($staff->IsActive() && strpos($staff->GetUsername(), $query) === 0)
 			{
 				array_push($data, $staff->GetUsername());
 			}
@@ -149,7 +149,7 @@ else if(Pages::GetCurrentPage() == "Typeahead")
 
 		foreach($clients as $client)
 		{
-			if(strpos($client->GetUsername(), $query) === 0)
+			if($client->IsActive() && strpos($client->GetUsername(), $query) === 0)
 			{
 				array_push($data, $client->GetUsername());
 			}

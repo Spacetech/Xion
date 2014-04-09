@@ -51,7 +51,7 @@ if(isset($_POST["update"]))
 elseif(isset($_POST["reassign"]))
 {
 	$staff = Staff::GetByUsername($_POST["staffusername"]);
-	if($staff->IsValid())
+	if($staff->IsValid() && $staff->IsActive())
 	{
 		if($staff->GetID() == $ticket->GetStaffID())
 		{

@@ -9,8 +9,9 @@ class Staff extends Base
 		global $database;
 
 		$points = 0;
+		$active = 1;
 
-		$statement = $database->prepare("INSERT INTO staff (name, type, username, password, building, email, phone_number, points) VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+		$statement = $database->prepare("INSERT INTO staff (name, type, username, password, building, email, phone_number, points, active) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)");
 		$statement->bindParam(1, $name, PDO::PARAM_STR);
 		$statement->bindParam(2, $type, PDO::PARAM_INT);
 		$statement->bindParam(3, $username, PDO::PARAM_STR);
@@ -19,6 +20,7 @@ class Staff extends Base
 		$statement->bindParam(6, $email, PDO::PARAM_STR);
 		$statement->bindParam(7, $phone_number, PDO::PARAM_STR);
 		$statement->bindParam(8, $points, PDO::PARAM_INT);
+		$statement->bindParam(9, $active, PDO::PARAM_INT);
 		$statement->execute();
 
 		return self::Load($database->lastInsertId());
@@ -110,6 +112,11 @@ class Staff extends Base
 		return $this->GetSafe("points");
 	}
 
+	public function IsActive()
+	{
+		return intval($this->GetSafe("active")) === 1;
+	}
+
 	public function IncrementPoints($amount)
 	{
 		global $database;
@@ -185,22 +192,34 @@ class Staff extends Base
 		global $database;
 
 		$id = $this->GetID();
+		$active = 1;
 
-		$statement = $database->prepare("UPDATE staff SET name=?, type=?, building=?, email=?, phone_number=? WHERE id=?");
+		$statement = $database->prepare("UPDATE staff SET name=?, type=?, building=?, email=?, phone_number=?, active=? WHERE id=?");
 		$statement->bindParam(1, $name, PDO::PARAM_STR);
 		$statement->bindParam(2, $type, PDO::PARAM_INT);
 		$statement->bindParam(3, $building, PDO::PARAM_STR);
 		$statement->bindParam(4, $email, PDO::PARAM_STR);
 		$statement->bindParam(5, $phone_number, PDO::PARAM_STR);
-		$statement->bindParam(6, $id, PDO::PARAM_INT);
+		$statement->bindParam(6, $active, PDO::PARAM_INT);
+		$statement->bindParam(7, $id, PDO::PARAM_INT);
 		$statement->execute();
 
 		$this->Reload();
 	}
 
-	public function GetCountClosedTickets()
+	public function SetActive($active)
 	{
-		return count(Ticket::GetByStaffIDWithStatusRaw($this->GetID(), STATUS_CLOSED));
+		global $database;
+		
+		$id = $this->GetID();
+
+		$statement = $database->prepare("UPDATE staff SET active=? WHERE id=?");
+		$statement->bindParam(1, $active, PDO::PARAM_INT);
+		$statement->bindParam(2, $id, PDO::PARAM_INT);
+
+		$statement->execute();
+
+		//$this->Reload();
 	}
 }
 

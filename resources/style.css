@@ -159,12 +159,12 @@ a
 	opacity: 0;
 }
 
-table.dataTable thead .sorting
-{
-	background: none;
-}
-
-table.dataTable thead .sorting_desc
+/* sb admin handles this */
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc,
+table.dataTable thead .sorting_asc_disabled,
+table.dataTable thead .sorting_desc_disabled
 {
 	background: none;
 }
