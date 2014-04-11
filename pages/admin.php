@@ -347,7 +347,52 @@ if(isset($_GET["staff"]))
 }
 elseif(isset($_GET["clients"]))
 {
-	if(isset($_POST["upload"]))
+	if(isset($_POST["add"]))
+	{
+		$name = $_POST["name"];
+		$username = CleanString($_POST["username"]);
+		$building = $_POST["building"];
+		$location = $_POST["location"];
+		$phone_number = CleanString($_POST["phone_number"]);
+
+		if(empty($name) || empty($username) || empty($building) || empty($location) || empty($phone_number))
+		{
+			ShowError("One or more fields were empty!");
+		}
+		elseif(!Building::Exists($building) && $building !== "N/A")
+		{
+			ShowError("Invalid building.");
+		}
+		else
+		{
+			$client = Client::GetByUsername($username);
+
+			if($client->IsValid())
+			{
+				if($client->IsActive())
+				{
+					ShowError("A client with that username already exists");
+				}
+				else
+				{
+					Client::EditByUsername($username, $name, $building, $location, $phone_number);
+
+					ShowInfo("Successfully Added Client");
+
+					RedirectTimer("admin&amp;clients", 3);
+				}
+			}
+			else
+			{
+				Client::Add($name, $username, $building, $location, $phone_number);
+
+				ShowInfo("Successfully Added Client");
+
+				RedirectTimer("admin&amp;clients", 3);
+			}
+		}
+	}
+	elseif(isset($_POST["upload"]))
 	{
 		if(!isset($_FILES['file']['error']))
 		{
@@ -364,13 +409,16 @@ elseif(isset($_GET["clients"]))
 
 				case UPLOAD_ERR_NO_FILE:
 					ShowError("No file was selected.");
+					break;
 
 				case UPLOAD_ERR_INI_SIZE:
 				case UPLOAD_ERR_FORM_SIZE:
 					ShowError("Exceeded filesize limit.");
+					break;
 
 				default:
 					ShowError("Unknown upload error.");
+					break;
 			}
 
 			if($good)
@@ -459,10 +507,60 @@ elseif(isset($_GET["clients"]))
 		</form>
 		<?php
 	}
+	elseif(isset($_GET["add"]))
+	{
+		?>
+		<form class="form-horizontal" role="form" method="post">
+
+			<div class="form-group">
+				<label for="name">Full Name</label>
+				<input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
+			</div>
+
+			<div class="form-group">
+				<label for="username">Username</label>
+				<input type="text" class="form-control" id="username" name="username" placeholder="Enter username">
+			</div>
+
+			<div class="form-group">
+				<label for="building">Building</label>
+				<select class="form-control" id="building" name="building">
+					<option value="N/A">N/A</option>
+					<?php
+					$parents = Building::GetUniqueParents();
+					foreach($parents as $parent)
+					{
+						$children = Building::GetChildren($parent);
+						echo "<optgroup label=\"".$parent."\">";
+						for($i=0; $i < count($children); $i++)
+						{
+							echo "<option>".$children[$i]->GetChild()."</option>";
+						}
+						echo "</optgroup>";
+					}
+					?>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label for="location">Location (Room Number)</label>
+				<input type="text" class="form-control" id="location" name="location" placeholder="Enter location">
+			</div>
+
+			<div class="form-group">
+				<label for="phone_number">Phone Number</label>
+				<input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Enter phone number">
+			</div>
+
+			<button type="submit" name="add" class="btn btn-default">Add Client</button>
+		</form>
+		<?php
+	}
 	else
 	{
 	?>
 		<p>
+			<a href="index.php?p=admin&amp;clients&amp;add"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Client</button></a>
 			<a href="index.php?p=admin&amp;clients&amp;upload"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Upload Client Database</button></a>
 		</p>
 
