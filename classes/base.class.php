@@ -82,14 +82,15 @@ class Base
 		$statement = $database->prepare("SELECT * FROM ".self::GetTable());
 		$statement->execute();
 
-		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		for($i=0; $i < count($all); $i++)
+		//$all = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$ret = array();
+		
+		while($data = $statement->fetch(PDO::FETCH_ASSOC))
 		{
-			$all[$i] = self::LoadData($all[$i]);
+			array_push($ret, self::LoadData($data));
 		}
 
-		return $all;
+		return $ret;
 	}
 
 	public function GetID()

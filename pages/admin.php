@@ -375,12 +375,7 @@ elseif(isset($_GET["clients"]))
 
 			if($good)
 			{
-				if(!is_dir("uploads"))
-				{
-					mkdir("uploads");
-				}
-
-				$filename = "uploads/".time();
+				$filename = "data/clients_".time().".csv";
 
 				if(!move_uploaded_file($_FILES['file']['tmp_name'], $filename))
 				{
@@ -392,16 +387,25 @@ elseif(isset($_GET["clients"]))
 
 					if($handle)
 					{
+						// we are working with a lot of data here
+						// we rarely update the client list, this should be fine
+						ini_set("memory_limit", "512M");
+
+						// mark all current clients as inactive
+						Client::SetAllInactive();
+
 						$database->beginTransaction();
 
-						// get all current clients
-						$clients = Client::GetAll();
+						// get the usernames of all the current clients
+						$usernames = Client::GetUsernames();
 
-						// mark them all as inactive
-						foreach($clients as $client)
+						// for faster lookup
+						$usernames_fast = array();
+						foreach(array_values($usernames) as $v)
 						{
-							$client->SetActive(0);
+							$usernames_fast[$v] = 1;
 						}
+
 
 						while(($line = fgets($handle)) !== false)
 						{
@@ -415,19 +419,12 @@ elseif(isset($_GET["clients"]))
 							$done = false;
 							$username = CleanString($data[1]);
 
-							foreach($clients as $client)
+							if(isset($usernames_fast[$username]))
 							{
-								if($client->GetUsername() === $username)
-								{
-									// update the existing one
-									$done = true;
-									$client->SetActive(1);
-									$client->Edit($data[0], $data[2], $data[3], $data[4]);
-									break;
-								}
+								// update current client
+								Client::EditByUsername($username, $data[0], $data[2], $data[3], $data[4]);
 							}
-
-							if(!$done)
+							else
 							{
 								// add new client
 								Client::Add($data[0], $data[1], $data[2], $data[3], $data[4]);
@@ -435,11 +432,6 @@ elseif(isset($_GET["clients"]))
 						}
 
 						fclose($handle);
-
-						foreach($clients as $client)
-						{
-							$client->UpdateActive();
-						}
 
 						$database->commit();
 
@@ -474,7 +466,7 @@ elseif(isset($_GET["clients"]))
 			<a href="index.php?p=admin&amp;clients&amp;upload"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Upload Client Database</button></a>
 		</p>
 
-		<table class="table table-bordered table-striped table-hover">
+		<table class="table table-bordered table-striped table-hover dt-clients">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -486,24 +478,6 @@ elseif(isset($_GET["clients"]))
 				</tr>
 			</thead>
 			<tbody class="searchable">
-				<?php
-				foreach(Client::GetAll() as $client)
-				{
-					if(!$client->IsActive())
-					{
-						continue;
-					}
-
-					echo "<tr>";
-					echo "<td>".$client->GetID()."</td>";
-					echo "<td>".$client->GetName()."</td>";
-					echo "<td>".$client->GetUsername()."</td>";
-					echo "<td>".$client->GetBuilding()."</td>";
-					echo "<td>".$client->GetLocation()."</td>";
-					echo "<td>".$client->GetPhoneNumber()."</td>";
-					echo "</tr>";
-				}
-				?>
 			</tbody>
 		</table>
 	<?php

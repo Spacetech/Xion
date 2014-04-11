@@ -1,7 +1,7 @@
 <?php
 
-$openTickets = Ticket::GetByStaffIDWithStatus($me->GetID(), STATUS_OPENED);
-$closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLOSED, "closed_date", "DESC");
+$openTickets = Ticket::GetByStaffIDWithStatusCount($me->GetID(), STATUS_OPENED);
+$closedTickets = Ticket::GetByStaffIDWithStatusCount($me->GetID(), STATUS_CLOSED);
 
 ?>
 
@@ -12,7 +12,7 @@ $closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLO
 				<i class="fa fa-circle-o fa-fw"></i> Open Tickets
 			</div>
 			<div class="panel-body nopadding">
-				<table class="table table-bordered table-striped table-hover">
+				<table class="table table-bordered table-striped table-hover dt-tickets" data-q="-1">
 					<thead>
 						<tr>
 							<th width="25px">#</th>
@@ -22,20 +22,6 @@ $closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLO
 						</tr>
 					</thead>
 					<tbody class="searchable rowlink" data-link="row">
-						<?php
-
-						foreach($openTickets as $ticket)
-						{
-							$client = Client::Load($ticket->GetClientID());
-
-							echo "<tr class='linkrow danger' href='index.php?p=ticket&amp;id=".$ticket->GetID()."'>";
-							echo "<td>".$ticket->GetID()."</td>";
-							echo "<td>".$client->GetUsername()."</td>";
-							echo "<td>".DisplayDatetime($ticket->GetCreationDate())."</td>";
-							echo "<td>".DisplayLimited($ticket->GetDescription())."</td>";
-							echo "</tr>";
-						}
-						?>
 					</tbody>
 				</table>
 			</div>
@@ -59,8 +45,9 @@ $closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLO
 					</thead>
 					<tbody class="searchable rowlink" data-link="row">
 						<?php
+						$tickets = Ticket::GetByStaffIDWithStatusOrderLimit($me->GetID(), STATUS_CLOSED, "closed_date", "DESC", 20);
 
-						foreach($closedTickets as $ticket)
+						foreach($tickets as $ticket)
 						{
 							$client = Client::Load($ticket->GetClientID());
 
@@ -71,6 +58,7 @@ $closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLO
 							echo "<td>".DisplayDatetime($ticket->GetClosedDate())."</td>";
 							echo "</tr>";
 						}
+
 						?>
 					</tbody>
 				</table>
@@ -88,7 +76,7 @@ $closedTickets = Ticket::GetByStaffIDWithStatusAndOrder($me->GetID(), STATUS_CLO
 			<div class="panel-body nopadding">
 				<div id="morris-lifetime-ticket-stats"></div>
 				<?php
-				if(count($openTickets) == 0 && count($closedTickets) == 0)
+				if($openTickets == 0 && $closedTickets == 0)
 				{
 					echo "No stats available.";
 				}
@@ -152,21 +140,21 @@ $(document).ready(function() {
 		element: 'morris-lifetime-ticket-stats',
 		data: [
 		<?php 
-		if(count($openTickets) > 0)
+		if($openTickets > 0)
 		{
 		?>
 			{
 				label: "Open Tickets",
-				value: <?php echo count($openTickets); ?>
+				value: <?php echo $openTickets; ?>
 			},
 		<?php
 		}
-		if(count($closedTickets) > 0)
+		if($closedTickets > 0)
 		{
 		?>
 		{
 			label: "Closed Tickets",
-			value: <?php echo count($closedTickets); ?>
+			value: <?php echo $closedTickets; ?>
 		}
 		<?php
 		}
@@ -175,12 +163,12 @@ $(document).ready(function() {
 		colors: [
 		<?php
 
-		if(count($openTickets) > 0)
+		if($openTickets > 0)
 		{
 			echo '"#ff0000",';
 		}
 
-		if(count($closedTickets) > 0)
+		if($closedTickets > 0)
 		{
 			echo '"#00ff00",';
 		}
@@ -193,41 +181,15 @@ $(document).ready(function() {
 		element: 'morris-calls-open-per-community',
 		data: [
 <?php
-$openTicketsByCommunity = array();
-$openTicketsByBuilding = array();
 
-$openTickets = Ticket::GetByStatus(STATUS_OPENED);
+$statement = $database->prepare("SELECT community, COUNT(*) FROM tickets GROUP BY community");
+$statement->execute();
 
-foreach($openTickets as $ticket)
+$all = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+foreach($all as $community)
 {
-	$client = Client::Load($ticket->GetClientID());
-
-	if($client->IsValid())
-	{
-		if(!array_key_exists($client->GetBuilding(), $openTicketsByBuilding))
-		{
-			$openTicketsByBuilding[$client->GetBuilding()] = 0;
-		}
-
-		$openTicketsByBuilding[$client->GetBuilding()]++;
-	}
-}
-
-while (list($key, $value) = each($openTicketsByBuilding))
-{
-	$parent = Building::GetCommunity($key);
-
-	if(!array_key_exists($parent, $openTicketsByCommunity))
-	{
-		$openTicketsByCommunity[$parent] = 0;
-	}
-
-	$openTicketsByCommunity[$parent] += $value;
-}
-
-while (list($key, $value) = each($openTicketsByCommunity))
-{
-	echo "{ x: \"".$key. "\", y: ".$openTicketsByCommunity[$key]." },";
+	echo "{ x: \"".$community["community"]. "\", y: ".$community["COUNT(*)"]." },";
 }
 
 ?>

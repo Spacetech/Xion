@@ -266,7 +266,6 @@ if(!is_null($updates))
 ?>
 <div class="row">
 	<div class="col-lg-12">
-		<div class="panel-group" id="accordion">
 		<?php
 		for($i=0; $i < count($updates); $i++)
 		{
@@ -281,20 +280,15 @@ if(!is_null($updates))
 			?>
 			<div class="panel panel-default">
 				<div class="panel-heading">
-					<h4 class="panel-title">
-						<a data-toggle="collapse" data-target="#collapse_<?php echo $i; ?>">Update #<?php echo $i + 1; ?> - <?php echo $update_staff->GetUsername(); ?> - <?php echo DisplayDatetime($time); ?></a>
-					</h4>
+					Update #<?php echo $i + 1; ?> - <?php echo $update_staff->GetUsername(); ?> - <?php echo DisplayDatetime($time); ?>
 				</div>
-				<div id="collapse_<?php echo $i; ?>" class="panel-collapse collapse in">
-					<div class="panel-body">
-						<?php echo $description; ?>
-					</div>
+				<div class="panel-body">
+					<?php echo $description; ?>
 				</div>
 			</div>
 			<?php
 		}
 		?>
-		</div>
 	</div>
 </div>
 

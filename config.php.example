@@ -17,67 +17,18 @@ $emailArray = array(
 	'password' => 'password'
 );
 
-$database = new PDO("sqlite:database.sqlite3");
+$database = new PDO("mysql:host=localhost;dbname=xion", "root", "password");
 
 /*
 
+Not needed:
 pear channel-discover twilio.github.com/pear
 pear install twilio/Services_Twilio
 
 pear install Mail
 pear install Net_SMTP
 
--- Describe USERS
-CREATE TABLE "clients" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"name" TEXT,
-	"username" TEXT,
-	"building" TEXT,
-	"location" TEXT,
-	"phone_number" TEXT,
-	"active" INTEGER(1)
-)
 
--- Describe STAFF
-CREATE TABLE "staff" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"type" INTEGER,
-	"name" TEXT,
-	"username" TEXT,
-	"password" TEXT,
-	"building" TEXT,
-	"email" TEXT,
-	"phone_number" TEXT,
-	"points" INTEGER,
-	"active" INTEGER(1)
-)
-
--- Describe TICKETS
-CREATE TABLE "tickets" (
-	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
-	"cid" INTEGER,
-	"sid" INTEGER,
-	"creatorid" INTEGER,
-	"creation_date" INTEGER,
-	"last_modified_date" INTEGER,
-	"closed_date" INTEGER,
-	"description" TEXT,
-	"updates" TEXT,
-	"status" INTEGER,
-	"tags" TEXT
-)
-
--- Describe TAGS
-CREATE TABLE "tags" (
-	"parent" TEXT,
-	"child" TEXT
-)
-
--- Describe BUILDINGS
-CREATE TABLE "buildings" (
-	"parent" TEXT,
-	"child" TEXT
-)
 
 */
 

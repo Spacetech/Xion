@@ -2,7 +2,7 @@
 
 class Ticket extends Base
 {
-	public static function Add($cid, $sid, $description, $status, $tags)
+	public static function Add($cid, $sid, $description, $status, $tags, $building, $community)
 	{
 		global $database;
 
@@ -11,7 +11,7 @@ class Ticket extends Base
 		$encodedTags = json_encode($tags);
 		$encodedNull = json_encode(null);
 
-		$statement = $database->prepare("INSERT INTO tickets (cid, sid, creatorid, creation_date, last_modified_date, closed_date, description, status, tags, updates) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+		$statement = $database->prepare("INSERT INTO tickets (cid, sid, creatorid, creation_date, last_modified_date, closed_date, description, status, tags, updates, building, community) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
 		$statement->bindParam(1, $cid, PDO::PARAM_INT);
 		$statement->bindParam(2, $sid, PDO::PARAM_INT);
@@ -23,28 +23,12 @@ class Ticket extends Base
 		$statement->bindParam(8, $status, PDO::PARAM_INT);
 		$statement->bindParam(9, $encodedTags, PDO::PARAM_STR);
 		$statement->bindParam(10, $encodedNull, PDO::PARAM_STR);
+		$statement->bindParam(11, $building, PDO::PARAM_STR);
+		$statement->bindParam(12, $community, PDO::PARAM_STR);
 
 		$statement->execute();
 
 		return self::Load($database->lastInsertId());
-	}
-
-	public static function GetByStaffID($sid)
-	{
-		global $database;
-
-		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=?");
-		$statement->bindParam(1, $sid, PDO::PARAM_INT);
-		$statement->execute();
-
-		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		for($i=0; $i < count($all); $i++)
-		{
-			$all[$i] = self::LoadData($all[$i]);
-		}
-
-		return $all;
 	}
 
 	public static function GetByStaffIDOrderSingle($sid, $column, $dir)
@@ -58,29 +42,23 @@ class Ticket extends Base
 		return self::LoadData($statement->fetch(PDO::FETCH_ASSOC));
 	}
 
-	public static function GetByStatus($status)
+	public static function GetByStaffIDWithStatusCount($sid, $status)
 	{
 		global $database;
 
-		$statement = $database->prepare("SELECT * FROM tickets WHERE status=?");
-		$statement->bindParam(1, $status, PDO::PARAM_INT);
-		$statement->execute();
+		$statement = $database->prepare("SELECT COUNT(*) FROM tickets WHERE sid=? AND status=?");
+		$statement->bindParam(1, $sid, PDO::PARAM_INT);
+		$statement->bindParam(2, $status, PDO::PARAM_INT);
+		$result = $statement->execute();
 
-		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		for($i=0; $i < count($all); $i++)
-		{
-			$all[$i] = self::LoadData($all[$i]);
-		}
-
-		return $all;
+		return $result ? $statement->fetch(PDO::FETCH_NUM)[0] : 0;
 	}
 
-	public static function GetByStaffIDWithStatus($sid, $status)
+	public static function GetByStaffIDWithStatusOrderLimit($sid, $status, $column, $dir, $limit)
 	{
 		global $database;
 
-		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=?");
+		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=? ORDER BY ".$column." ".$dir." LIMIT ".$limit);
 		$statement->bindParam(1, $sid, PDO::PARAM_INT);
 		$statement->bindParam(2, $status, PDO::PARAM_INT);
 		$statement->execute();
@@ -93,104 +71,6 @@ class Ticket extends Base
 		}
 
 		return $all;
-	}
-
-	public static function GetByStaffIDWithStatusAndOrder($sid, $status, $column, $dir)
-	{
-		global $database;
-
-		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=? ORDER BY ".$column." ".$dir."");
-		$statement->bindParam(1, $sid, PDO::PARAM_INT);
-		$statement->bindParam(2, $status, PDO::PARAM_INT);
-		$statement->execute();
-
-		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		for($i=0; $i < count($all); $i++)
-		{
-			$all[$i] = self::LoadData($all[$i]);
-		}
-
-		return $all;
-	}
-
-	public static function GetByStaffIDWithStatusRaw($sid, $status)
-	{
-		global $database;
-
-		$statement = $database->prepare("SELECT * FROM tickets WHERE sid=? AND status=?");
-		$statement->bindParam(1, $sid, PDO::PARAM_INT);
-		$statement->bindParam(2, $status, PDO::PARAM_INT);
-		$statement->execute();
-
-		$all = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-		return $all;
-	}
-
-	public static function GetOpenTicketsInBuilding($building)
-	{
-		$tickets = array();
-
-		$openTickets = self::GetByStatus(STATUS_OPENED);
-
-		foreach($openTickets as $ticket)
-		{
-			$client = Client::Load($ticket->GetClientID());
-
-			if($client->IsValid() && $client->GetBuilding() === $building)
-			{
-				array_push($tickets, $ticket);
-			}
-		}
-
-		return $tickets;
-	}
-
-	public static function GetOpenTicketsInCommunity($building)
-	{
-		$community = Building::GetCommunity($building);
-
-		$tickets = array();
-
-		$openTickets = self::GetByStatus(STATUS_OPENED);
-
-		foreach($openTickets as $ticket)
-		{
-			$client = Client::Load($ticket->GetClientID());
-
-			if($client->IsValid() && Building::GetCommunity($client->GetBuilding()) === $community)
-			{
-				array_push($tickets, $ticket);
-			}
-		}
-
-		return $tickets;
-	}
-
-	public static function GetQuery($q)
-	{
-		global $me;
-
-		switch($q)
-		{
-			case QUERY_MY_OPEN_TICKETS:
-				return self::GetByStaffIDWithStatus($me->GetID(), STATUS_OPENED);
-
-			case QUERY_ALL_MY_TICKETS:
-				return self::GetByStaffID($me->GetID());
-
-			case QUERY_OPEN_TICKETS_IN_MY_BUILDING:
-				return self::GetOpenTicketsInBuilding($me->GetBuilding());
-
-			case QUERY_OPEN_TICKETS_IN_MY_COMMUNITY:
-				return self::GetOpenTicketsInCommunity($me->GetBuilding());
-
-			case QUERY_ALL_TICKETS:
-			default:
-				return self::GetAll();
-
-		}
 	}
 
 	public function GetClientID()

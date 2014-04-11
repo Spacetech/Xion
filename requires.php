@@ -2,6 +2,13 @@
 
 session_start();
 
+set_time_limit(0);
+
+if(!is_dir("data"))
+{
+	mkdir("data");
+}
+
 require_once("config.php");
 
 require_once("constants.php");
@@ -24,6 +31,7 @@ require_once("twilio-php-latest/Services/Twilio.php");
 function ErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 {
 	LogError(debug_backtrace());
+
 	/*
 	echo 'Into '.__FUNCTION__.'() at line '.__LINE__.
 	"\n\n---ERRNO---\n". print_r( $errno, true).
@@ -34,6 +42,7 @@ function ErrorHandler($errno, $errstr, $errfile, $errline, $errcontext)
 	"\n\nBacktrace of errorHandler()\n".
 	print_r( debug_backtrace(), true);
 	*/
+
 	return true;
 }
 
@@ -61,10 +70,9 @@ UpdateLoggedIn();
 
 $twilio = new Services_Twilio($twilioAccountSid, $twilioAuthToken);
 
-
 /*
+
 $BUILDINGS = array(
-	"N/A",
 	"College-in-the-Woods" => array(
 		"Cayuga",
 		"Mohawk",
@@ -174,5 +182,50 @@ $TAGS = array(
 	)
 );
 
+foreach ($BUILDINGS as $key => $value)
+{
+	foreach($value as $building)
+	{
+		Building::Add($building, $key);
+	}
+}
+
+foreach ($TAGS as $key => $value)
+{
+	foreach($value as $tag)
+	{
+		Tag::Add($tag, $key);
+	}
+}
+
 */
+
+/*
+
+$database->beginTransaction();
+
+for($i=0; $i < 300000; $i++)
+{
+	Client::Add("Client #".$i, "client".$i, "O'Connor", "Room ".$i, "N/A");
+}
+
+$database->commit();
+
+*/
+
+/*
+$database->beginTransaction();
+
+$client = Client::Load(300039);
+$community = Building::GetCommunity($client->GetBuilding())
+/*;
+
+for($i=0; $i < 300000; $i++)
+{
+	$ticket = Ticket::Add($client->GetID(), $me->GetID(), "This clients Mac is broken", STATUS_OPENED, array("Apple,Laptop"), $client->GetBuilding(), $community);
+}
+
+$database->commit();
+*/
+
 ?>

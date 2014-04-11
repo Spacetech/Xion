@@ -1,27 +1,77 @@
 $(document).ready(function() {
 
-	$('table').not(".nodatatable").dataTable({
+	/*
+		Make all tables look nice
+	*/
+
+	$('table').not(".nodatatable").not(".dt-clients").not(".dt-tickets").dataTable({
 		"aaSorting": [],
 		"oLanguage": {
 			"sSearch": "<i class=\"fa fa-search\"></i> <span style=\"font-weight: 700; margin-right: 4px;\">Filter </span>"
 		}
 	});
 
+	/*
+		Special table for the clients list
+	*/
+
+	$('.dt-clients').dataTable({
+		"aaSorting": [],
+		"oLanguage": {
+			"sSearch": "<i class=\"fa fa-search\"></i> <span style=\"font-weight: 700; margin-right: 4px;\">Filter </span>"
+		},
+		"bProcessing": true,
+		"bServerSide": true,
+		"sAjaxSource": "index.php?p=dt_clients"
+	});
+	
+	/*
+		Special table for the tickets list
+	*/
+
+	$('.dt-tickets').dataTable({
+		"aaSorting": [],
+		"oLanguage": {
+			"sSearch": "<i class=\"fa fa-search\"></i> <span style=\"font-weight: 700; margin-right: 4px;\">Filter </span>"
+		},
+		"bProcessing": true,
+		"bServerSide": true,
+		"sAjaxSource": "index.php?p=dt_tickets",
+		"fnServerData": function(sSource, aoData, fnCallback) {
+			aoData["q"] = $('.dt-tickets').data("q");
+			$.getJSON(sSource, aoData, fnCallback);
+		},
+		"fnCreatedRow": function(nRow, aData, iDataIndex)
+		{
+			$(nRow).attr("href", "index.php?p=ticket&id=" + aData[0]);
+		}
+	});
+
+	/*
+		Popup windows for deleting things
+	*/
+
 	$(".staff_delete").click(function() {
 		$(".staff_delete_button").attr("href", "index.php?p=admin&staff&id=" + $(this).data('id') + "&delete");
 	});
-	
 	$(".tag_delete").click(function() {
 		$(".tag_delete_button").attr("href", "index.php?p=admin&tags&name=" + $(this).data('name') + "&delete");
 	});
-
 	$(".building_delete").click(function() {
 		$(".building_delete_button").attr("href", "index.php?p=admin&buildings&name=" + $(this).data('name') + "&delete");
 	});
 
-	$('#side-menu').metisMenu();
+	/*
+		Side bar menu
+	*/
 
-	$(".linkrow").on('mousedown', function(e) {
+	$("#side-menu").metisMenu();
+
+	/*
+		Make table rows clickable
+	*/
+
+	$(document.body).on("mousedown", ".linkrow", function(e) {
 		if(e.which <= 2)
 		{
 			if(e.which == 2)
@@ -37,6 +87,10 @@ $(document).ready(function() {
 			}
 		}
 	});
+
+	/*
+		Fillin client info after you type/select one
+	*/
 
 	var last = ""
 
@@ -58,6 +112,10 @@ $(document).ready(function() {
 	$("#clientid").bind("keyup", OnClientIDChanged);
 	$('#clientid').bind('typeahead:selected', OnClientIDChanged);
 
+	/*
+		Resize sidebar on window width change
+	*/
+
 	$(window).bind("load resize", function() {
 		width = (this.window.innerWidth > 0) ? this.window.innerWidth : this.screen.width;
 		if (width < 768) {
@@ -66,6 +124,11 @@ $(document).ready(function() {
 			$('div.sidebar-collapse').removeClass('collapse')
 		}
 	});
+
+	/*
+		typeahead
+		clients
+	*/
 
 	var clientids = new Bloodhound({
 		datumTokenizer: function (d) {
@@ -95,6 +158,11 @@ $(document).ready(function() {
 		source: clientids.ttAdapter()
 	});
 	
+	/*
+		typeahead
+		staff
+	*/
+
 	var staffusernames = new Bloodhound({
 		datumTokenizer: function (d) {
 			return Bloodhound.tokenizers.whitespace(d.value);
@@ -123,7 +191,11 @@ $(document).ready(function() {
 		source: staffusernames.ttAdapter()
 	});
 
-	$('#tags').selectpicker();
+	/*
+		Make the tags and building select menus look nice
+	*/
 
+	$('#tags').selectpicker();
 	$('#building').selectpicker();
+
 });

@@ -2,7 +2,7 @@
 
 class Pages
 {
-	private static $Pages = array("Dashboard", "Tickets", "Ticket", "New Ticket", "Login", "Logout", "Settings", "Profile", "Typeahead", "SMS", "Admin");
+	private static $Pages = array("Dashboard", "Tickets", "Ticket", "New Ticket", "Login", "Logout", "Settings", "Profile", "Typeahead", "SMS", "DT Clients", "DT Tickets", "Admin");
 	private static $CurrentPage = "Dashboard";
 	
 	public static function Init()

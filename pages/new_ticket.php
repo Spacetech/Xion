@@ -25,7 +25,7 @@ if(isset($_POST["ticket"]))
 		}
 		else
 		{
-			$ticket = Ticket::Add($client->GetID(), $me->GetID(), $description, STATUS_OPENED, $tags);
+			$ticket = Ticket::Add($client->GetID(), $me->GetID(), $description, STATUS_OPENED, $tags, $client->GetBuilding(), Building::GetCommunity($client->GetBuilding()));
 
 			$me->IncrementPoints(5);
 
