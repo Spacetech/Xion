@@ -186,3 +186,9 @@ table.dataTable thead .sorting_desc_disabled
 	font-size: 14px;
 	background-color: white;
 }
+
+.global-footer
+{
+	margin-top: 20px;
+	text-align: center;
+}

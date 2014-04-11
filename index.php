@@ -549,6 +549,16 @@ else if(Pages::GetCurrentPage() == "DT Tickets")
 		
 		include("pages/".Pages::CleanPage(Pages::GetCurrentPage()).".php");
 
+		?>
+
+		<div class="row global-footer">
+			<div class="col-lg-12">
+				<a href="https://github.com/Spacetech/Xion">Open Source on GitHub</a>
+			</div>
+		</div>
+
+		<?php
+
 		if(!is_null($me))
 		{
 			?>
