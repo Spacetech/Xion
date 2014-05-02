@@ -26,6 +26,16 @@ class Staff extends Base
 		return self::Load($database->lastInsertId());
 	}
 
+	public static function GetUsernames()
+	{
+		global $database;
+
+		$statement = $database->prepare("SELECT username FROM staff");
+		$result = $statement->execute();
+
+		return $result ? $statement->fetchAll(PDO::FETCH_COLUMN, 0) : null;
+	}
+
 	public static function GetByUsername($username)
 	{
 		global $database;
@@ -35,6 +45,38 @@ class Staff extends Base
 		$result = $statement->execute();
 
 		return self::LoadData($result ? $statement->fetch(PDO::FETCH_ASSOC) : null);
+	}
+
+	public static function EditByUsername($username, $name, $password, $building, $email, $phone_number)
+	{
+		global $database;
+
+		if(strlen($password > 0))
+		{
+			$hashed = EncryptPassword($password);
+			$statement = $database->prepare("UPDATE staff SET name=?, building=?, email=?, phone_number=?, password=? WHERE username=?");
+		}
+		else
+		{
+			$statement = $database->prepare("UPDATE staff SET name=?, building=?, email=?, phone_number=? WHERE username=?");
+		}
+		
+		$statement->bindParam(1, $name, PDO::PARAM_STR);
+		$statement->bindParam(2, $building, PDO::PARAM_STR);
+		$statement->bindParam(3, $email, PDO::PARAM_STR);
+		$statement->bindParam(4, $phone_number, PDO::PARAM_STR);
+
+		if(strlen($password > 0))
+		{
+			$statement->bindParam(5, $hashed, PDO::PARAM_STR);
+			$statement->bindParam(6, $username, PDO::PARAM_STR);
+		}
+		else
+		{
+			$statement->bindParam(5, $username, PDO::PARAM_STR);
+		}
+
+		$statement->execute();
 	}
 
 	public static function GetTop10()

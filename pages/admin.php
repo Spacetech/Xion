@@ -63,6 +63,116 @@ if(isset($_GET["staff"]))
 			}
 		}
 	}
+	elseif(isset($_POST["upload"]))
+	{
+		if(!isset($_FILES['file']['error']))
+		{
+			ShowError("Unable to upload file.");
+		}
+		else
+		{
+			$good = false;
+
+			switch ($_FILES['file']['error']) {
+				case UPLOAD_ERR_OK:
+					$good = true;
+					break;
+
+				case UPLOAD_ERR_NO_FILE:
+					ShowError("No file was selected.");
+					break;
+
+				case UPLOAD_ERR_INI_SIZE:
+				case UPLOAD_ERR_FORM_SIZE:
+					ShowError("Exceeded filesize limit.");
+					break;
+
+				default:
+					ShowError("Unknown upload error.");
+					break;
+			}
+
+			if($good)
+			{
+				$filename = "data/staff_".time().".csv";
+
+				if(!move_uploaded_file($_FILES['file']['tmp_name'], $filename))
+				{
+					ShowError("Unable to move uploaded file.");
+				}
+				else
+				{
+					$handle = @fopen($filename, "r");
+
+					if($handle)
+					{
+						// we may be working with a lot of data here
+						ini_set("memory_limit", "512M");
+
+						$database->beginTransaction();
+
+						// get the usernames of all the current clients
+						$usernames = Staff::GetUsernames();
+
+						// for faster lookup
+						$usernames_fast = array();
+						foreach(array_values($usernames) as $v)
+						{
+							$usernames_fast[$v] = 1;
+						}
+
+						while(($line = fgets($handle)) !== false)
+						{
+							if(strpos($line, "#") === 0)
+							{
+								continue;
+							}
+
+							$data = explode(",", $line);
+
+							$done = false;
+							$username = CleanString($data[1]);
+
+							if(isset($usernames_fast[$username]))
+							{
+								// update current staff
+								Staff::EditByUsername($username, $data[0], EncryptPassword($data[2]), $data[3], $data[4], $data[5]);
+							}
+							else
+							{
+								// add new staff
+								Staff::Add($data[0], TYPE_RESCON, $username, $data[2], $data[3], $data[4], $data[5]);
+							}		
+						}
+
+						fclose($handle);
+
+						$database->commit();
+
+						ShowInfo("Done");
+
+						RedirectTimer("admin&amp;staff", 3);
+					}
+				}
+			}
+		}
+	}
+	elseif(isset($_GET["upload"]))
+	{
+		?>
+		<form role="form" method="post" enctype="multipart/form-data">
+			<div class="form-group">
+				<label for="file">Staff Database File</label>
+				<input type="file" class="form-control" id="file" name="file">
+				<p class="help-block">Select the staff database file.</p>
+				<h2>This will merge all existing staff members with the ones from the file.</h2>
+			</div>
+			<div class="form-group">
+				<button type="submit" name="upload" class="btn btn-default">Upload Staff Database File</button>
+			</div>
+		</form>
+		<?php
+	}
 	elseif(isset($_GET["add"]))
 	{
 		?>
@@ -280,6 +390,7 @@ if(isset($_GET["staff"]))
 
 		<p>
 			<a href="index.php?p=admin&amp;staff&amp;add"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Staff Member</button></a>
+			<a href="index.php?p=admin&amp;staff&amp;upload"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Upload Staff Database</button></a>
 		</p>
 
 		<table class="table table-bordered table-striped table-hover">
@@ -454,7 +565,6 @@ elseif(isset($_GET["clients"]))
 							$usernames_fast[$v] = 1;
 						}
 
-
 						while(($line = fgets($handle)) !== false)
 						{
 							if(strpos($line, "#") === 0)
@@ -475,7 +585,7 @@ elseif(isset($_GET["clients"]))
 							else
 							{
 								// add new client
-								Client::Add($data[0], $data[1], $data[2], $data[3], $data[4]);
+								Client::Add($data[0], $username, $data[2], $data[3], $data[4]);
 							}
 						}
 
